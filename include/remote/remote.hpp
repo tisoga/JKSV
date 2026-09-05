@@ -18,4 +18,10 @@ namespace remote
 
     /// @brief Returns the pointer to the Storage instance.
     remote::Storage *get_remote_storage() noexcept;
+
+    /// @brief Reinitializes the WebDAV storage service in a background thread.
+    void reinitialize_webdav();
+
+    /// @brief Resets the active remote storage.
+    void reset_storage() noexcept;
 } // namespace remote

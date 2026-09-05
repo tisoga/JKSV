@@ -184,7 +184,8 @@
         "22: Whether or not to load and display Cache save data. This can be used to store DLC and various other things. *This requires a restart to take effect!*",
         "23: Whether or not the system save data is loaded and displayed. *This requires a restart to take effect!*",
         "24: Moves deleted backups to the _TRASH_ folder instead of permanently deleting them. This only effects local backups.",
-        "25: Sets the speed at which transitions and animations occur. Lower is faster. One is instant, four is the slowest before things start breaking."
+        "25: Sets the speed at which transitions and animations occur. Lower is faster. One is instant, four is the slowest before things start breaking.",
+        "26: Configure WebDAV remote storage (URL, Basepath, Username, Password)."
     ],
     "SettingsMenu": [
         "0: Set JKSV output folder.",
@@ -212,7 +213,8 @@
         "22: Show Cache save data: %s",
         "23: Show System Save Data: %s",
         "24: Enable trash bin: %s",
-        "25: Animation scaling: %.02f"
+        "25: Animation scaling: %.02f",
+        "26: Configure WebDAV"
     ],
     "SettingsPops": [
         "0: Blacklist is empty!",

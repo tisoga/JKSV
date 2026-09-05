@@ -76,6 +76,9 @@ class SettingsState final : public BaseState
         /// @brief Cycles and wraps the animation scaling (1.0 to 4.0);
         void cycle_anim_scaling();
 
+        /// @brief Creates and pushes the WebDAV configuration panel.
+        void create_push_webdav_config();
+
         // Returns On/Off depending on the value passed.
         const char *get_status_text(uint8_t value);
 

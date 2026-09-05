@@ -1,6 +1,7 @@
 #include "appstates/SettingsState.hpp"
 
 #include "appstates/BlacklistEditState.hpp"
+#include "appstates/WebDavConfigState.hpp"
 #include "appstates/MainMenuState.hpp"
 #include "appstates/MessageState.hpp"
 #include "config/config.hpp"
@@ -26,7 +27,7 @@ namespace
     constexpr std::string_view CONFIG_KEY_NULL = "NULL";
 
     /// @brief This makes it easier to work with key indexes. Anything NULL is something that is not easily toggled.
-    constexpr std::array<std::string_view, 26> CONFIG_KEY_ARRAY = {CONFIG_KEY_NULL,
+    constexpr std::array<std::string_view, 27> CONFIG_KEY_ARRAY = {CONFIG_KEY_NULL,
                                                                    CONFIG_KEY_NULL,
                                                                    config::keys::INCLUDE_DEVICE_SAVES,
                                                                    config::keys::AUTO_BACKUP_ON_RESTORE,
@@ -51,18 +52,20 @@ namespace
                                                                    config::keys::SHOW_CACHE_USER,
                                                                    config::keys::SHOW_SYSTEM_USER,
                                                                    config::keys::ENABLE_TRASH_BIN,
+                                                                   CONFIG_KEY_NULL,
                                                                    CONFIG_KEY_NULL};
 
     /// @brief These are the indexes used for case indexing.
     enum CaseIndexes
     {
-        ChangeWorkDir = 0,
-        EditBlacklist = 1,
-        CycleZip      = 16,
-        CycleSortType = 17,
-        ToggleJKSM    = 18,
-        ToggleTrash   = 24,
-        CycleScaling  = 25
+        ChangeWorkDir   = 0,
+        EditBlacklist   = 1,
+        CycleZip        = 16,
+        CycleSortType   = 17,
+        ToggleJKSM      = 18,
+        ToggleTrash     = 24,
+        CycleScaling    = 25,
+        ConfigureWebDav = 26
     };
 
 } // namespace
@@ -118,6 +121,10 @@ void SettingsState::load_settings_menu()
     for (int i = 0; (option = strings::get_by_name(strings::names::SETTINGS_MENU, i)); i++)
     {
         m_settingsMenu->add_option(option);
+    }
+    if (m_settingsMenu->get_option_count() <= CaseIndexes::ConfigureWebDav)
+    {
+        m_settingsMenu->add_option("26: Configure WebDAV");
     }
 }
 
@@ -230,14 +237,15 @@ void SettingsState::toggle_options()
 
     switch (selected)
     {
-        case CaseIndexes::ChangeWorkDir: SettingsState::change_working_directory(); break;
-        case CaseIndexes::EditBlacklist: SettingsState::create_push_blacklist_edit(); break;
-        case CaseIndexes::CycleZip:      SettingsState::cycle_zip_level(); break;
-        case CaseIndexes::CycleSortType: SettingsState::cycle_sort_type(); break;
-        case CaseIndexes::ToggleJKSM:    SettingsState::toggle_jksm_mode(); break;
-        case CaseIndexes::ToggleTrash:   SettingsState::toggle_trash_folder(); break;
-        case CaseIndexes::CycleScaling:  SettingsState::cycle_anim_scaling(); break;
-        default:                         config::toggle_by_key(CONFIG_KEY_ARRAY[selected]); break;
+        case CaseIndexes::ChangeWorkDir:   SettingsState::change_working_directory(); break;
+        case CaseIndexes::EditBlacklist:   SettingsState::create_push_blacklist_edit(); break;
+        case CaseIndexes::CycleZip:        SettingsState::cycle_zip_level(); break;
+        case CaseIndexes::CycleSortType:   SettingsState::cycle_sort_type(); break;
+        case CaseIndexes::ToggleJKSM:      SettingsState::toggle_jksm_mode(); break;
+        case CaseIndexes::ToggleTrash:     SettingsState::toggle_trash_folder(); break;
+        case CaseIndexes::CycleScaling:    SettingsState::cycle_anim_scaling(); break;
+        case CaseIndexes::ConfigureWebDav: SettingsState::create_push_webdav_config(); break;
+        default:                           config::toggle_by_key(CONFIG_KEY_ARRAY[selected]); break;
     }
 
     SettingsState::update_menu_options();
@@ -249,12 +257,22 @@ void SettingsState::reset_settings()
     SettingsState::update_menu_options();
 }
 
+void SettingsState::create_push_webdav_config()
+{
+    WebDavConfigState::create_and_push();
+}
+
 void SettingsState::create_push_description_message()
 {
-    const int selected      = m_settingsMenu->get_selected();
-    const char *description = strings::get_by_name(strings::names::SETTINGS_DESCRIPTIONS, selected);
+    const int selected = m_settingsMenu->get_selected();
+    if (selected == CaseIndexes::ConfigureWebDav)
+    {
+        MessageState::create_push_fade("Configure WebDAV remote storage (URL, Basepath, Username, Password).");
+        return;
+    }
 
-    MessageState::create_push_fade(description);
+    const char *description = strings::get_by_name(strings::names::SETTINGS_DESCRIPTIONS, selected);
+    if (description) { MessageState::create_push_fade(description); }
 }
 
 void SettingsState::cycle_zip_level()

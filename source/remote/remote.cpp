@@ -113,6 +113,26 @@ remote::Storage *remote::get_remote_storage() noexcept
     return s_storage.get();
 }
 
+void remote::reinitialize_webdav()
+{
+    sys::threadpool::push_job(
+        [](sys::threadpool::JobData) {
+            if (!remote::has_internet_connection())
+            {
+                const char *popNoInternet = strings::get_by_name(strings::names::REMOTE_POPS, 0);
+                ui::PopMessageManager::push_message(ui::PopMessageManager::DEFAULT_TICKS, popNoInternet ? popNoInternet : "No internet connection!");
+                return;
+            }
+            initialize_webdav();
+        },
+        nullptr);
+}
+
+void remote::reset_storage() noexcept
+{
+    s_storage.reset();
+}
+
 static void drive_sign_in(sys::threadpool::JobData taskData)
 {
     static constexpr const char *STRING_ERROR_SIGNING_IN = "Error signing into Google Drive: %s";

@@ -1,0 +1,30 @@
+name: Build JKSV
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "**" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: devkitpro/devkita64:latest
+
+    steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build JKSV
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          make -j$(nproc)
+
+      - name: Upload NRO artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: JKSV
+          path: JKSV.nro

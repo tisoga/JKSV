@@ -71,6 +71,9 @@ namespace ui
             /// @brief Returns if the menu has no options.
             bool is_empty() const noexcept;
 
+            /// @brief Returns the total number of options in the menu.
+            size_t get_option_count() const noexcept { return m_options.size(); }
+
             /// @brief Plays the cursor sound effect since it can be conditional.
             void play_sound() noexcept;
 

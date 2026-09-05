@@ -104,15 +104,19 @@ bool remote::WebDav::create_directory(std::string_view name)
     if (!curl::perform(m_curl)) { return false; }
 
     const long code = curl::get_response_code(m_curl);
-    if (code != 201)
+    // 201 = Created, 405 = Collection already exists (RFC 4918)
+    if (code != 201 && code != 405)
     {
         logger::log(STRING_CREATE_DIR_ERROR, name.data());
         return false;
     }
 
     // This is the ID string so we can make WebDav work within the same framework as Google Drive.
-    std::string id = m_parent + "/" + escapedName + "/";
-    m_list.emplace_back(name, id, m_parent, 0, true);
+    if (find_directory_by_name(name) == m_list.end())
+    {
+        std::string id = m_parent + "/" + escapedName + "/";
+        m_list.emplace_back(name, id, m_parent, 0, true);
+    }
 
     return true;
 }
